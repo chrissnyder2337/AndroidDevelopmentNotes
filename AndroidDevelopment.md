@@ -1,6 +1,170 @@
 
+-------------
+Android Software Stack
+-------------
+1. Linux Kernal
+    * Security
+    * Memory management
+    * Drivers:
+        * Example: Display driver
+    * Android Specific Linu:
+        * Power management
+        * Binder
+        * Low Memory killer
+2. Libraries & Android runtime
+    * System C Library, SLL, Webkit
+    * Core Java Libraries
+        * basic java classes (java.*)
+        * android java classes (android.*)
+        * Junit classes
+    * Dalvaik Virtual Machine
+        * designed to run in resource constrined enviroments
+3. Appplication Framework
+    * Package Manager
+        * DB that keeps track of all applications installed.
+    * View System
+    * Activity Manager
+    * Resource Manager
+        * Manages non-compliles resources like strings and images
+4. Applications
+    * phone
+    * browse
 
-## Permissions
+-------------
+Application Components
+-------------
+There are 4 main components:
+
+* Activity
+* Serivce
+* Broardcastreceiver
+* Contentprovider
+
+
+### Activity Class
+
+Used to present GUI to user and capture their interaction
+
+
+#### Activity Lifecycle
+*Dont make fun of my ascii art*
+
+```
+ACTIVITY LAUNCED
+    ||
+    \/
+onCreate()<=====================\\
+    ||                          ||
+    \/                          ||
+onStart()<=========onRestart()  ||
+    ||                   /\     ||
+    \/                   ||     || App. process
+onResume()<===========   ||     ||    killed
+    ||               ||  ||     ||
+    \/               ||  ||     ||
+ACTIVITY RUNNING     ||  ||     ||
+    ||               ||  ||     ||
+    \/               || /==\    ||
+onPause()===========/_==/||\====++
+    ||                   ||     ||
+    \/                   ||     ||
+onStop()========================//
+    ||
+    \/
+onDestroy()
+    ||
+    \/
+ACTIVITY SHUTDOWN
+```
+##### onCreate()
+
+Things typicly done during this function call:
+
+* Restore saved state
+    * call `super.onCreate()`
+* set content view
+* initialize UI
+* Link UI to actions
+
+##### onRestart()
+Called only when the activity has been stopped and is about to be started again.
+
+##### onStart()
+When the activity is about to become visible.
+
+##### onResume()
+When applicaiton is about to become in forground
+
+##### onPause()
+
+When applicaiton leaves the forground. Last chance to do something before applicaiton closes. It is guarentted to be run. 
+
+##### onStop()
+
+When application is about to become invisible.
+NOTE: May not be called if android kills your application.
+
+
+##### onDestroy()
+
+NOTE: May not be called if android kills your application.
+
+### Service Class
+
+Runs long running operations. Runs in the background.
+
+### BroadcastReciver Class
+
+Listens for and responds to events. They "subscribe" to events.
+
+### ContentProvider Class
+
+Facilitates the storage and access of data. 
+Example: bookmarks are stored in a content provider.
+
+
+### Resource: Strings
+
+Strings strings are stored in *res/values/strings.xml*
+Itallian strings are stored in *res/values-it/strings.xml*
+Stored in xml tags: `<string name="hello">Hello World</string>`
+
+
+##### Accessing strings
+
+By other resource files: `@string/string_name`
+By java files: `R.string.string_name`
+
+### Resource: Layout fikes
+
+Stored in *res/layout/*.xml*.
+Landscape version of the layout file stored in *res/layout-land/*.xml*
+
+
+### AndroidManifest.xml
+
+* Application Name
+* Components
+* Permissions
+* Minnimanl API Level `<uses-sdk android:minSdkVersion="16" >
+
+### Task Backstack
+
+When activities are started they are added to the task backstack. When a the back button is pressed the current task is killed and is poped off the backstack.
+
+--------
+Intents
+-------
+
+New activities can be started with intents. Intents can be passed to either:
+
+Intents are passed to the following methods:
+* startActivity()
+* startActivityForResult()
+
+-------------
+Permissions
+-------------
 ### Using Permissions
 To state that your application uses a permission add a `<uses-permission>` tag to the AndroidManifest.xml.
 
