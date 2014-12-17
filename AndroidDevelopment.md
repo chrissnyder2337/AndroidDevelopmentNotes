@@ -77,10 +77,8 @@ Each fragment represents a portion of the UI and behavior. An Activity can have 
 <dt>onDestroy()</dt><dd>Called when Hosting Activity destroy's the fragment. You should null out references to the hosting activity here.</dd>
 <dt>onDetach()</dt><dd>Called when Hosting Activity detaches the Fragment</dd></dl>
 
-### Defining Fragments
-
 #### Staticly Defined
-Declare the fragments in the Activity’s layout file:
+Declare the Fragments in the Activity’s layout file:
 
 ```xml
 <LinearLayout>
@@ -100,7 +98,7 @@ Declare the fragments in the Activity’s layout file:
 </LinearLayout>
 ```
 
-and create a reference to in you activity:
+Create a reference to in you Activity:
 ```java
 public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,5 +106,164 @@ public class MainActivity extends Activity {
     }
 }
 ```
-#### Progra
-* Add it programmatically using the FragmentManager
+
+Inflate the the fragments's layout file in onCreateView()
+```java
+public class FragmentOne extends Fragment {
+    protected void onCreateView(LayoutInflater inflater, ViewGroup containter, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.frag_one_layout, container, false);
+    }
+}
+```
+#### Dynamicly Defined
+
+Define space for the fragments in the Activity's layout.xml by using FrameLayouts:
+```xml
+<LinearLayout>
+    <FrameLayout
+        android:id="@+id/first_frame"
+        android:layout_width="..."
+        android:layout_height="..."
+        android:layout_weight="..." />
+</LinearLayout>
+```
+
+Add the fragment to the frame following the following steps:
+1. Get a reference to the FragmentManager
+2. Begin a FragmentTransaction
+3. Add the Fragment 
+4. Commit the FragmentTransaction
+
+
+```java
+public class MainActivity extends Activity {
+    protected void onCreate(Bundle savedInstanceState) {
+       // 1. Get a reference to the FragmentManager
+       FragmentManager fragmentManager = getFragmentManager();
+       
+       // 2. Begin a FragmentTransaction
+       FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+       
+       // 3. Add the Fragment(s)
+       fragmentTransaction.add(R.id.first_frame, new FragmentOne());
+       
+       // 4. Commit the FragmentTransaction
+       fragmentTransaction.commit();
+    }
+}
+```
+
+##### Notable Fragment methods
+
+* **FragmentTransaction.addToBackStack(null)** - Adds the fragment transaction to the backstack so when the user hit the back button the fragment transaction will "undo"
+* **FragmentManager.executePendingTransactions()** - Forces the fragment changes to be applied immedialty. 
+* **Fragment.setRetainInstance(true)** - Andorid won't destroy the fragment on configuration changes.
+
+------------
+User Interface
+--------------
+TODO
+
+--------------
+User Notifications
+---------------
+
+### Toast Messaes
+
+Basic usage:
+```java
+Toast.makeText(getApplicationContext(), "Message", Toast.LENGTH_SHORT).show()
+```
+
+Toast messages with custom view:
+
+```java
+Toast toast = new Toast(getApplicationContext());
+toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+toast.setDuration(Toast.LENGTH_LONG);
+toast.setView(getLayoutInflater().inflate(R.layout.custom_layout, null));
+toast.show();
+```
+
+### Notificaiton Area Notifications
+
+* Notification (core notification
+    * Title
+    * Detail 
+    * Small icon
+* Notification Area
+    * Ticker text (displayed when notification first arrives in the notification bar)
+    * Small icon
+* Notification Drawer
+    * View
+    * Action (action that occurs when the user clicks on the drawer view)
+
+```java
+Notificaiton.Builder notificationBuilder = new Notificaiton.Builder(getApplicationContext())
+    .setTicker(tickerText)
+    .setSmallIcon(android.R.drawable.stat_sys_warning)
+    .setAutoCancel(true)
+    .setContentIntent(mContentIntent)
+    .setSound(soundURI)
+    .setVibrate(mVibratePattern)
+    .setContent(mContentView);
+    
+NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+mNotificationManager.notify(MY_NOTIFICATION_ID, notificationBuilder.build());
+```
+
+----------------------
+BroadcastReciver Class
+----------------------
+
+### Register a BroadcastReciver
+Staticly Register the BroadcastReciver in the AndroidManifest.xml. Staticly registered broadcastRecivers are registered by Android at boot.
+
+```xml
+<receiver
+    android:enabled=["true" | "false"]
+    android:exported=["true" | "false"]
+    android:icon="drawable resource"
+    android:label="string resource"
+    android:name="string"
+    android:permission="string"
+    android:process="string" >
+    <intent-filter> </intent-filter>
+</receiver>
+```
+
+### Send a Broadcast
+```java
+sendBroadcast(new Intent("com.example.SomeClass.SomeIntent"), android.Manifest.permission.VIBRATE);
+```
+
+
+### Recive a Broadcast
+```java
+public class Revicer extends BroadcastRevicer {
+    onReceive(Context context, Intent intent) {
+        // Do something with passed intent.
+    }
+}
+```
+
+
+### Dynamic Registration of BroadcastsRecivers
+Dymanic registration can be helpful if you only want to revice broadcasts when your applciation is in the forground. If that is the case you would create it in onCreate() and remvoe it in onPause().
+
+Can use the following methods to register the BroadcastReciver at runtime: 
+* LocalBroadcastManager.registerReceiver() 
+* Context.registerReceiver()
+
+### Event Broadcasts
+
+###### Normal vs. Ordered
+* Normal: processing order undefined
+* Ordered: sequential processing in priority order 
+
+###### Sticky vs. Non-Sticky 
+* Sticky: Store Intent after initial broadcast 
+* Non-Sticky: Discard Intent after initial broadcast 
+
+
+
